@@ -4,6 +4,7 @@ import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
@@ -81,36 +82,49 @@ private fun Greetings(names: List<String> = List(1000) { "$it" }) {
  */
 @Composable
 fun Greeting(name: String) {
-    val expanded = remember { mutableStateOf(false) }
-    val extraPadding by animateDpAsState(
-        if (expanded.value) 48.dp else 0.dp,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessLow
-        )
-    )
-    val iconBitmap = if (expanded.value) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore
-
-    Surface(
-        color = MaterialTheme.colors.primary,
-        modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
+    Card(
+        modifier = Modifier
+            .padding(vertical = 4.dp, horizontal = 8.dp)
     ) {
-        Row(modifier = Modifier.padding(24.dp)) {
-            Column(modifier = Modifier
-                .weight(1f)
-                .padding(bottom = extraPadding)
-            ) {
-                Text(text = "Hello,")
-                Text(text = "$name!", style = MaterialTheme.typography.h4.copy(
-                    fontWeight = FontWeight.ExtraBold
-                ))
-            }
-            IconButton(onClick = { expanded.value = !expanded.value }) {
-                Icon(
-                    imageVector = iconBitmap,
-                    contentDescription = if (expanded.value) "Show less" else "Show more"
+        CardContent(name = name)
+    }
+}
+
+@Composable
+fun CardContent(name: String) {
+    val expanded = remember { mutableStateOf(false) }
+    
+    Row(
+        modifier = Modifier
+            .animateContentSize(
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                    stiffness = Spring.StiffnessLow
                 )
+            )
+            .padding(12.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .padding(12.dp)
+        ) {
+            Text(text = "Hello,")
+            Text(
+                text = "$name", 
+                style = MaterialTheme.typography.h4.copy(
+                    fontWeight = FontWeight.ExtraBold
+                )
+            )
+            if (expanded.value) {
+                Text(text = "아무말이나 해보자\n도대체 무슨 말을 해야하는지 모르겠지만\n호호호")
             }
+        }
+        IconButton(onClick = { expanded.value = !expanded.value },) {
+            Icon(
+                imageVector = if (expanded.value) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
+                contentDescription = if (expanded.value) "Show less" else "Show more"
+            )
         }
     }
 }
